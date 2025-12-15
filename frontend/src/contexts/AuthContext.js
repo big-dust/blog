@@ -1,14 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '../services';
+import { createContext, useContext, useState, useEffect } from 'react';
+import authService from '../services/authService';
 
 const AuthContext = createContext();
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
 }
 
 export function AuthProvider({ children }) {
@@ -16,45 +14,33 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  // 检查初始认证状态
   useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = authService.isAuthenticated();
-      setIsAuthenticated(authenticated);
-      
-      if (authenticated) {
-        // 这里可以获取用户信息
-        setUser({ role: 'admin' }); // 临时设置
-      }
-      
+    const check = () => {
+      const auth = authService.isAuthenticated();
+      setIsAuthenticated(auth);
+      if (auth) setUser({ role: 'admin' });
       setLoading(false);
     };
+    check();
 
-    checkAuth();
-
-    // 监听认证状态变化
-    const handleAuthChange = () => {
+    const handleLogout = () => {
       setIsAuthenticated(false);
       setUser(null);
     };
-
-    window.addEventListener('auth:logout', handleAuthChange);
-    
-    return () => {
-      window.removeEventListener('auth:logout', handleAuthChange);
-    };
+    window.addEventListener('auth:logout', handleLogout);
+    return () => window.removeEventListener('auth:logout', handleLogout);
   }, []);
 
   const login = async (credentials) => {
     try {
-      const response = await authService.login(credentials);
+      const res = await authService.login(credentials);
       setIsAuthenticated(true);
-      setUser(response.user || { role: 'admin' });
-      return response;
-    } catch (error) {
+      setUser(res.user || { role: 'admin' });
+      return res;
+    } catch (e) {
       setIsAuthenticated(false);
       setUser(null);
-      throw error;
+      throw e;
     }
   };
 
@@ -67,16 +53,8 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const value = {
-    isAuthenticated,
-    user,
-    loading,
-    login,
-    logout
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

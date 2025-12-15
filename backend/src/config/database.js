@@ -11,7 +11,6 @@ const dbConfig = {
   timezone: '+08:00'
 };
 
-// 创建连接池
 const pool = mysql.createPool({
   ...dbConfig,
   waitForConnections: true,
@@ -19,144 +18,121 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// 数据库连接管理类
+// 数据库管理
 class DatabaseManager {
   constructor() {
     this.pool = pool;
     this.isConnected = false;
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
-    this.reconnectDelay = 5000; // 5秒
+    this.reconnectDelay = 5000;
   }
 
-  // 测试数据库连接
   async testConnection() {
     try {
-      const connection = await this.pool.getConnection();
-      await connection.ping();
-      connection.release();
+      const conn = await this.pool.getConnection();
+      await conn.ping();
+      conn.release();
       this.isConnected = true;
       this.reconnectAttempts = 0;
       console.log('数据库连接成功');
       return true;
-    } catch (error) {
+    } catch (e) {
       this.isConnected = false;
-      console.error('数据库连接失败:', error.message);
+      console.log('数据库连接失败:', e.message);
       return false;
     }
   }
 
-  // 执行查询
   async query(sql, params = []) {
     try {
       const [rows] = await this.pool.execute(sql, params);
       return rows;
-    } catch (error) {
-      console.error('数据库查询错误:', error.message);
-      console.error('SQL:', sql);
-      console.error('参数:', params);
-      
-      // 如果是连接错误，尝试重连
-      if (this.isConnectionError(error)) {
+    } catch (e) {
+      console.log('查询出错:', e.message);
+      // console.log('SQL:', sql);  // 调试用
+      if (this.isConnectionError(e)) {
         await this.handleConnectionError();
       }
-      
-      throw error;
+      throw e;
     }
   }
 
-  // 执行事务
   async transaction(callback) {
-    const connection = await this.pool.getConnection();
-    
+    const conn = await this.pool.getConnection();
     try {
-      await connection.beginTransaction();
-      const result = await callback(connection);
-      await connection.commit();
+      await conn.beginTransaction();
+      const result = await callback(conn);
+      await conn.commit();
       return result;
-    } catch (error) {
-      await connection.rollback();
-      throw error;
+    } catch (e) {
+      await conn.rollback();
+      throw e;
     } finally {
-      connection.release();
+      conn.release();
     }
   }
 
-  // 判断是否为连接错误
-  isConnectionError(error) {
-    const connectionErrorCodes = [
+  isConnectionError(err) {
+    const codes = [
       'PROTOCOL_CONNECTION_LOST',
       'ECONNRESET',
       'ECONNREFUSED',
       'ETIMEDOUT',
       'ENOTFOUND'
     ];
-    
-    return connectionErrorCodes.includes(error.code) || 
-           (error.message && error.message.includes('Connection lost')) ||
-           (error.message && error.message.includes('connect ECONNREFUSED'));
+    return codes.includes(err.code) || 
+           (err.message && err.message.includes('Connection lost'));
   }
 
-  // 处理连接错误
   async handleConnectionError() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('达到最大重连次数，停止重连');
+      console.log('重连次数太多了，不试了');
       return;
     }
-
     this.reconnectAttempts++;
-    console.log(`尝试重连数据库 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-    
-    await new Promise(resolve => setTimeout(resolve, this.reconnectDelay));
-    
-    const connected = await this.testConnection();
-    if (!connected && this.reconnectAttempts < this.maxReconnectAttempts) {
+    console.log(`重连中... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    await new Promise(r => setTimeout(r, this.reconnectDelay));
+    const ok = await this.testConnection();
+    if (!ok && this.reconnectAttempts < this.maxReconnectAttempts) {
       await this.handleConnectionError();
     }
   }
 
-  // 获取连接池状态
   getPoolStatus() {
     return {
-      connectionLimit: 10, // 固定值，因为我们在创建池时设置的
+      connectionLimit: 10,
       isConnected: this.isConnected
     };
   }
 
-  // 关闭连接池
   async close() {
     try {
       await this.pool.end();
-      console.log('数据库连接池已关闭');
-    } catch (error) {
-      console.error('关闭数据库连接池时出错:', error.message);
+      console.log('数据库关闭了');
+    } catch (e) {
+      console.log('关闭数据库出错:', e.message);
     }
   }
 }
 
-// 创建数据库管理器实例
 const db = new DatabaseManager();
 
-// 初始化数据库连接
 const initDatabase = async () => {
   try {
     await db.testConnection();
     
-    // 监听进程退出事件，优雅关闭连接
     process.on('SIGINT', async () => {
-      console.log('收到 SIGINT 信号，正在关闭数据库连接...');
       await db.close();
       process.exit(0);
     });
     
     process.on('SIGTERM', async () => {
-      console.log('收到 SIGTERM 信号，正在关闭数据库连接...');
       await db.close();
       process.exit(0);
     });
-    
-  } catch (error) {
-    console.error('数据库初始化失败:', error.message);
+  } catch (e) {
+    console.log('数据库初始化失败:', e.message);
     process.exit(1);
   }
 };

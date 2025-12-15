@@ -9,36 +9,32 @@ function AdminPanel() {
   const [activeTab, setActiveTab] = useState('editor');
   const [editingArticle, setEditingArticle] = useState(null);
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      // In a real app, you'd redirect to login page
-      alert('请先登录以访问管理面板');
+      alert('请先登录');
     }
   }, [isAuthenticated, loading]);
 
-  const handleEditArticle = (article) => {
+  const handleEdit = (article) => {
     setEditingArticle(article);
     setActiveTab('editor');
   };
 
-  const handleSaveArticle = (savedArticle) => {
+  const handleSave = () => {
     setEditingArticle(null);
     setActiveTab('manager');
   };
 
-  const handleCancelEdit = () => {
+  const handleCancel = () => {
     setEditingArticle(null);
   };
 
-  const handleNewArticle = () => {
+  const handleNew = () => {
     setEditingArticle(null);
     setActiveTab('editor');
   };
 
-  if (loading) {
-    return <div className="loading">加载中...</div>;
-  }
+  if (loading) return <div className="loading">加载中...</div>;
 
   if (!isAuthenticated) {
     return (
@@ -46,7 +42,7 @@ function AdminPanel() {
         <div className="admin-container">
           <div className="auth-required">
             <h2>需要登录</h2>
-            <p>请先登录以访问管理面板</p>
+            <p>请先登录</p>
           </div>
         </div>
       </div>
@@ -73,21 +69,19 @@ function AdminPanel() {
             </button>
           </div>
           {activeTab === 'manager' && (
-            <button onClick={handleNewArticle} className="new-article-button">
-              新建文章
-            </button>
+            <button onClick={handleNew} className="new-article-button">新建文章</button>
           )}
         </div>
         <div className="admin-content">
           {activeTab === 'editor' && (
             <ArticleEditor
               editingArticle={editingArticle}
-              onSave={handleSaveArticle}
-              onCancel={editingArticle ? handleCancelEdit : null}
+              onSave={handleSave}
+              onCancel={editingArticle ? handleCancel : null}
             />
           )}
           {activeTab === 'manager' && (
-            <ArticleManager onEditArticle={handleEditArticle} />
+            <ArticleManager onEditArticle={handleEdit} />
           )}
         </div>
       </div>

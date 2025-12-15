@@ -1,0 +1,137 @@
+# Implementation Plan
+
+- [x] 1. 删除所有测试代码
+  - [x] 1.1 删除 backend/src/__tests__/ 整个目录
+    - 删除所有后端测试文件
+    - _Requirements: 7.1, 7.2_
+  - [x] 1.2 删除 frontend 测试文件
+    - 删除 frontend/src/**/*.test.js
+    - 删除 frontend/src/setupTests.js
+    - _Requirements: 7.1, 7.2_
+
+- [x] 2. 改造 Backend 核心文件
+  - [x] 2.1 改造 backend/src/server.js
+    - 移除详尽注释，添加随意风格注释
+    - 简化错误响应结构
+    - 添加一些历史痕迹（注释掉的旧代码）
+    - _Requirements: 1.1, 1.2, 1.3, 4.1, 4.4, 8.1, 8.2_
+  - [x] 2.2 改造 backend/src/middleware/auth.js
+    - 移除 JSDoc 注释
+    - 简化命名和错误响应
+    - _Requirements: 1.2, 2.1, 4.1_
+  - [x] 2.3 改造 backend/src/config/database.js
+    - 移除详尽注释
+    - 简化代码风格
+    - _Requirements: 1.1, 1.2_
+  - [x] 2.4 改造 backend/src/utils/database.js
+    - 移除所有 JSDoc 注释
+    - 简化方法命名
+    - _Requirements: 1.2, 2.4_
+  - [x] 2.5 改造 backend/src/utils/errors.js
+    - 简化错误处理代码
+    - _Requirements: 4.1, 4.2_
+
+- [x] 3. 改造 Backend 路由文件
+  - [x] 3.1 改造 backend/src/routes/articles.js
+    - 移除注释，添加少量随意注释
+    - 简化错误响应
+    - 添加历史痕迹
+    - _Requirements: 1.1, 1.3, 4.1, 8.1, 8.3_
+  - [x] 3.2 改造 backend/src/routes/auth.js
+    - 移除注释，简化错误响应
+    - _Requirements: 1.1, 4.1_
+  - [x] 3.3 改造 backend/src/routes/categories.js
+    - 移除注释，简化错误响应
+    - _Requirements: 1.1, 4.1_
+  - [x] 3.4 改造 backend/src/routes/tags.js
+    - 移除注释，简化错误响应
+    - _Requirements: 1.1, 4.1_
+  - [x] 3.5 改造 backend/src/routes/comments.js
+    - 移除注释，简化错误响应
+    - _Requirements: 1.1, 4.1_
+  - [x] 3.6 改造 backend/src/routes/search.js
+    - 移除注释，简化错误响应
+    - _Requirements: 1.1, 4.1_
+  - [x] 3.7 改造 backend/src/routes/upload.js
+    - 移除注释，简化错误响应
+    - _Requirements: 1.1, 4.1_
+
+- [x] 4. 改造 Frontend Services
+  - [x] 4.1 改造 frontend/src/services/api.js
+    - 移除类的详尽注释
+    - 简化命名
+    - _Requirements: 1.2, 2.1, 2.4_
+  - [x] 4.2 改造 frontend/src/services/articleService.js
+    - 移除注释
+    - _Requirements: 1.1_
+  - [x] 4.3 改造其他 service 文件
+    - authService.js, categoryService.js, commentService.js
+    - tagService.js, searchService.js, uploadService.js
+    - _Requirements: 1.1_
+
+- [x] 5. 改造 Frontend Components
+  - [x] 5.1 改造 frontend/src/components/Header.js
+    - 移除注释，简化命名
+    - _Requirements: 1.1, 2.1_
+  - [x] 5.2 改造 frontend/src/components/ArticleList.js
+    - 移除注释，添加历史痕迹
+    - _Requirements: 1.1, 8.1_
+  - [x] 5.3 改造 frontend/src/components/ArticleContent.js
+    - 移除注释
+    - _Requirements: 1.1_
+  - [x] 5.4 改造 frontend/src/components/ArticleEditor.js
+    - 移除注释，添加随意注释
+    - _Requirements: 1.1, 1.3_
+  - [x] 5.5 改造 frontend/src/components/CommentSection.js
+    - 移除注释，简化命名
+    - _Requirements: 1.1, 2.1_
+  - [x] 5.6 改造其他组件文件
+    - SearchBox.js, LoginModal.js, Sidebar.js
+    - CategoryList.js, TagCloud.js, EmptyState.js, Footer.js
+    - _Requirements: 1.1_
+
+- [x] 6. 改造 Frontend Pages
+  - [x] 6.1 改造 frontend/src/pages/HomePage.js
+    - 移除注释
+    - _Requirements: 1.1_
+  - [x] 6.2 改造 frontend/src/pages/ArticleDetail.js
+    - 移除注释，添加历史痕迹
+    - _Requirements: 1.1, 8.1_
+  - [x] 6.3 改造 frontend/src/pages/AdminPanel.js
+    - 移除注释
+    - _Requirements: 1.1_
+  - [x] 6.4 改造其他页面文件
+    - CategoryPage.js, TagPage.js, SearchResults.js
+    - _Requirements: 1.1_
+
+- [x] 7. 改造 Frontend 其他文件
+  - [x] 7.1 改造 frontend/src/contexts/AuthContext.js
+    - 移除注释
+    - _Requirements: 1.1_
+  - [x] 7.2 改造 frontend/src/hooks/useAPI.js
+    - 移除注释
+    - _Requirements: 1.1_
+  - [x] 7.3 改造 frontend/src/App.js
+    - 保持简洁，移除多余注释
+    - _Requirements: 1.1_
+
+- [x] 8. 改造 CSS 文件
+  - [x] 8.1 改造 frontend/src/App.css
+    - 混用 px 和 rem
+    - _Requirements: 5.1_
+  - [x] 8.2 改造组件 CSS 文件
+    - Header.css, ArticleList.css, ArticleContent.css
+    - ArticleEditor.css, CommentSection.css 等
+    - 混用颜色格式，移除注释
+    - _Requirements: 5.1, 5.2, 5.3_
+  - [x] 8.3 改造页面 CSS 文件
+    - HomePage.css, ArticleDetail.css, AdminPanel.css 等
+    - _Requirements: 5.1, 5.2, 5.3_
+
+- [x] 9. 最终验证
+  - [x] 9.1 启动后端服务验证功能
+    - 确保 API 正常工作
+    - _Requirements: 6.3_
+  - [x] 9.2 启动前端服务验证功能
+    - 确保页面正常显示和交互
+    - _Requirements: 6.3_

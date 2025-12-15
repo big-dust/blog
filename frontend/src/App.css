@@ -12,18 +12,18 @@
 
 .loading {
   text-align: center;
-  padding: 2rem;
-  color: #666;
+  padding: 30px;
+  color: gray;
 }
 
 .error {
   text-align: center;
-  padding: 2rem;
-  color: #dc3545;
+  padding: 30px;
+  color: red;
 }
 
 .not-found {
   text-align: center;
-  padding: 2rem;
-  color: #6c757d;
+  padding: 30px;
+  color: #666;
 }

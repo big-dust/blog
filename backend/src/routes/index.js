@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// 基础路由
 router.get('/', (req, res) => {
   res.json({
-    message: '个人博客 API',
+    message: '博客API',
     version: '1.0.0',
     endpoints: {
       articles: '/api/articles',

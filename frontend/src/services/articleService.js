@@ -1,54 +1,39 @@
 import httpClient from './api';
 
-// 文章相关 API 服务
-export const articleService = {
+const articleService = {
   // 获取文章列表
   async getArticles(params = {}) {
-    const {
-      page = 1,
-      limit = 10,
-      categoryId,
-      tagId,
-      search
-    } = params;
-
-    const queryParams = { page, limit };
-    if (categoryId) queryParams.category_id = categoryId;
-    if (tagId) queryParams.tag_id = tagId;
-    if (search) queryParams.search = search;
-
-    return httpClient.get('/articles', queryParams);
+    const { page = 1, limit = 10, categoryId, tagId, search } = params;
+    const query = { page, limit };
+    if (categoryId) query.category_id = categoryId;
+    if (tagId) query.tag_id = tagId;
+    if (search) query.search = search;
+    return httpClient.get('/articles', query);
   },
 
-  // 获取单篇文章
   async getArticle(id) {
     return httpClient.get(`/articles/${id}`);
   },
 
-  // 创建文章
-  async createArticle(articleData) {
-    return httpClient.post('/articles', articleData);
+  async createArticle(data) {
+    return httpClient.post('/articles', data);
   },
 
-  // 更新文章
-  async updateArticle(id, articleData) {
-    return httpClient.put(`/articles/${id}`, articleData);
+  async updateArticle(id, data) {
+    return httpClient.put(`/articles/${id}`, data);
   },
 
-  // 删除文章
   async deleteArticle(id) {
     return httpClient.delete(`/articles/${id}`);
   },
 
-  // 增加浏览次数
   async incrementViewCount(id) {
     return httpClient.post(`/articles/${id}/view`);
   },
 
-  // 搜索文章
-  async searchArticles(query, params = {}) {
+  async searchArticles(q, params = {}) {
     const { page = 1, limit = 10 } = params;
-    return httpClient.get('/search', { q: query, page, limit });
+    return httpClient.get('/search', { q, page, limit });
   }
 };
 

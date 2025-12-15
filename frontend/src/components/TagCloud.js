@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import tagService from '../services/tagService';
 import EmptyState from './EmptyState';
@@ -9,10 +9,10 @@ function TagCloud() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Calculate weight based on usage frequency (requirement 3.4)
-  const calculateWeight = (count, maxCount) => {
-    if (maxCount === 0) return 1;
-    const ratio = count / maxCount;
+  // 根据使用频率计算权重
+  const calcWeight = (count, max) => {
+    if (max === 0) return 1;
+    const ratio = count / max;
     if (ratio >= 0.8) return 5;
     if (ratio >= 0.6) return 4;
     if (ratio >= 0.4) return 3;
@@ -21,54 +21,37 @@ function TagCloud() {
   };
 
   useEffect(() => {
-    const fetchTagCloud = async () => {
+    const fetch = async () => {
       try {
         setLoading(true);
-        setError(null);
-        const response = await tagService.getTagCloud();
-        const tagsData = response.data || [];
-        
-        // Calculate weights based on usage frequency
-        const maxCount = Math.max(...tagsData.map(tag => tag.count || 0));
-        const tagsWithWeights = tagsData.map(tag => ({
-          ...tag,
-          weight: calculateWeight(tag.count || 0, maxCount)
-        }));
-        
-        setTags(tagsWithWeights);
-      } catch (err) {
-        console.error('Failed to fetch tag cloud:', err);
-        setError('标签云加载失败');
-        setTags([]);
+        const res = await tagService.getTagCloud();
+        const data = res.data || [];
+        const max = Math.max(...data.map(t => t.count || 0));
+        setTags(data.map(t => ({ ...t, weight: calcWeight(t.count || 0, max) })));
+      } catch (e) {
+        setError('加载失败');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchTagCloud();
+    fetch();
   }, []);
 
   if (loading) return <div className="loading">加载中...</div>;
-  
-  if (error) {
-    return <EmptyState message={error} icon="❌" />;
-  }
-
-  if (tags.length === 0) {
-    return <EmptyState message="暂无标签" icon="🏷️" />;
-  }
+  if (error) return <EmptyState message={error} icon="❌" />;
+  if (tags.length === 0) return <EmptyState message="暂无标签" icon="🏷️" />;
 
   return (
     <div className="tag-cloud">
-      {tags.map(tag => (
+      {tags.map(t => (
         <Link
-          key={tag.id}
-          to={`/tag/${tag.id}`}
-          className={`tag-cloud-item weight-${tag.weight}`}
-          style={{ backgroundColor: tag.color || '#007bff' }}
-          title={`${tag.name} (${tag.count || 0} 篇文章)`}
+          key={t.id}
+          to={`/tag/${t.id}`}
+          className={`tag-cloud-item weight-${t.weight}`}
+          style={{ backgroundColor: t.color || '#007bff' }}
+          title={`${t.name} (${t.count || 0} 篇)`}
         >
-          {tag.name} ({tag.count || 0})
+          {t.name} ({t.count || 0})
         </Link>
       ))}
     </div>

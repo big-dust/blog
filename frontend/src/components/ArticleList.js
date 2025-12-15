@@ -8,32 +8,27 @@ function ArticleList({ categoryId, tagId, searchQuery }) {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+  const [total, setTotal] = useState(0);
 
   const fetchArticles = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const params = {
-        page: currentPage,
-        limit: 10
-      };
 
+      const params = { page, limit: 10 };
       if (categoryId) params.categoryId = categoryId;
       if (tagId) params.tagId = tagId;
       if (searchQuery) params.search = searchQuery;
 
-      const response = await articleService.getArticles(params);
-      
-      setArticles(response.data || []);
-      setTotalPages(response.pagination?.totalPages || 1);
-      setTotalCount(response.pagination?.total || 0);
-    } catch (err) {
-      console.error('Failed to fetch articles:', err);
-      setError('加载文章失败，请稍后重试');
+      const res = await articleService.getArticles(params);
+      setArticles(res.data || []);
+      setTotalPages(res.pagination?.totalPages || 1);
+      setTotal(res.pagination?.total || 0);
+    } catch (e) {
+      console.log('加载文章失败:', e);
+      setError('加载失败');
       setArticles([]);
     } finally {
       setLoading(false);
@@ -42,13 +37,11 @@ function ArticleList({ categoryId, tagId, searchQuery }) {
 
   useEffect(() => {
     fetchArticles();
-  }, [categoryId, tagId, searchQuery, currentPage]);
+  }, [categoryId, tagId, searchQuery, page]);
 
-  // Reset to page 1 when filters change
+  // 筛选条件变了就回到第一页
   useEffect(() => {
-    if (currentPage !== 1) {
-      setCurrentPage(1);
-    }
+    if (page !== 1) setPage(1);
   }, [categoryId, tagId, searchQuery]);
 
   if (loading) return <div className="loading">加载中...</div>;
@@ -57,23 +50,17 @@ function ArticleList({ categoryId, tagId, searchQuery }) {
     return (
       <div className="error-state">
         <p>{error}</p>
-        <button onClick={fetchArticles} className="retry-button">
-          重试
-        </button>
+        <button onClick={fetchArticles} className="retry-button">重试</button>
       </div>
     );
   }
 
   if (articles.length === 0) {
-    let emptyMessage = "暂无文章";
-    if (searchQuery) {
-      emptyMessage = `未找到包含 "${searchQuery}" 的文章`;
-    } else if (categoryId) {
-      emptyMessage = "该分类下暂无文章";
-    } else if (tagId) {
-      emptyMessage = "该标签下暂无文章";
-    }
-    return <EmptyState message={emptyMessage} />;
+    let msg = "暂无文章";
+    if (searchQuery) msg = `没找到 "${searchQuery}" 相关的文章`;
+    else if (categoryId) msg = "该分类下暂无文章";
+    else if (tagId) msg = "该标签下暂无文章";
+    return <EmptyState message={msg} />;
   }
 
   return (
@@ -93,21 +80,18 @@ function ArticleList({ categoryId, tagId, searchQuery }) {
             <p className="article-summary">{article.summary}</p>
             <div className="article-footer">
               {article.category_name && (
-                <Link 
-                  to={`/category/${article.category_id}`} 
-                  className="category-link"
-                >
+                <Link to={`/category/${article.category_id}`} className="category-link">
                   {article.category_name}
                 </Link>
               )}
               <div className="article-tags">
-                {article.tags && article.tags.map((tagName, index) => (
+                {article.tags && article.tags.map((tag, i) => (
                   <Link
-                    key={index}
-                    to={`/tag/${article.tag_ids ? article.tag_ids[index] : index}`}
+                    key={i}
+                    to={`/tag/${article.tag_ids ? article.tag_ids[i] : i}`}
                     className="tag-link"
                   >
-                    {tagName}
+                    {tag}
                   </Link>
                 ))}
               </div>
@@ -115,23 +99,23 @@ function ArticleList({ categoryId, tagId, searchQuery }) {
           </article>
         ))}
       </div>
-      
-      {/* Show pagination when there are more than 10 articles (requirement 7.2) */}
-      {totalCount > 10 && (
+
+      {/* 分页 */}
+      {total > 10 && (
         <div className="pagination">
           <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
             className="pagination-button"
           >
             上一页
           </button>
           <span className="pagination-info">
-            第 {currentPage} 页，共 {totalPages} 页 (共 {totalCount} 篇文章)
+            第 {page} 页，共 {totalPages} 页 (共 {total} 篇)
           </span>
           <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
             className="pagination-button"
           >
             下一页

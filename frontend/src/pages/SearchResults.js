@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import EmptyState from '../components/EmptyState';
 import searchService from '../services/searchService';
@@ -11,25 +11,21 @@ function SearchResults() {
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
 
-  const fetchSearchResults = async (page = 1) => {
+  const doSearch = async (p = 1) => {
     if (!query || query.trim() === '') {
       setLoading(false);
       return;
     }
-
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await searchService.searchArticles(query, { page, limit: 10 });
-      
-      setResults(response.articles || []);
-      setPagination(response.pagination);
-    } catch (err) {
-      console.error('搜索失败:', err);
-      setError(err.message || '搜索失败，请稍后重试');
+      const res = await searchService.searchArticles(query, { page: p, limit: 10 });
+      setResults(res.articles || []);
+      setPagination(res.pagination);
+    } catch (e) {
+      setError(e.message || '搜索失败');
       setResults([]);
     } finally {
       setLoading(false);
@@ -37,39 +33,27 @@ function SearchResults() {
   };
 
   useEffect(() => {
-    setCurrentPage(1);
-    fetchSearchResults(1);
+    setPage(1);
+    doSearch(1);
   }, [query]);
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    fetchSearchResults(page);
-    // 滚动到顶部
+  const handlePageChange = (p) => {
+    setPage(p);
+    doSearch(p);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 验证搜索关键词 (requirement 4.4)
   if (!query || query.trim() === '') {
-    return (
-      <div className="search-results">
-        <div className="search-container">
-          <EmptyState message="请输入搜索关键词" />
-        </div>
-      </div>
-    );
+    return <div className="search-results"><div className="search-container"><EmptyState message="请输入关键词" /></div></div>;
   }
-
   if (loading) return <div className="loading">搜索中...</div>;
-
   if (error) {
     return (
       <div className="search-results">
         <div className="search-container">
           <div className="error-state">
             <p>{error}</p>
-            <button onClick={() => fetchSearchResults(currentPage)} className="retry-button">
-              重试
-            </button>
+            <button onClick={() => doSearch(page)} className="retry-button">重试</button>
           </div>
         </div>
       </div>
@@ -82,64 +66,37 @@ function SearchResults() {
         <div className="search-header">
           <h1>搜索结果</h1>
           <p>关键词: "{query}"</p>
-          {pagination && pagination.total > 0 && (
-            <p className="results-count">找到 {pagination.total} 篇文章</p>
-          )}
+          {pagination && pagination.total > 0 && <p className="results-count">找到 {pagination.total} 篇</p>}
         </div>
-        
+
         {results.length > 0 ? (
           <>
             <div className="search-results-list">
-              {results.map(article => (
-                <article key={article.id} className="search-result-item">
+              {results.map(a => (
+                <article key={a.id} className="search-result-item">
                   <h2 className="result-title">
-                    <Link 
-                      to={`/article/${article.id}`}
-                      dangerouslySetInnerHTML={{ __html: article.title }}
-                    />
+                    <Link to={`/article/${a.id}`} dangerouslySetInnerHTML={{ __html: a.title }} />
                   </h2>
                   <div className="result-meta">
-                    <span className="result-date">
-                      {new Date(article.created_at).toLocaleDateString('zh-CN')}
-                    </span>
-                    <span className="result-views">浏览: {article.view_count || 0}</span>
-                    {article.category_name && (
-                      <span className="result-category">{article.category_name}</span>
-                    )}
+                    <span className="result-date">{new Date(a.created_at).toLocaleDateString('zh-CN')}</span>
+                    <span className="result-views">浏览: {a.view_count || 0}</span>
+                    {a.category_name && <span className="result-category">{a.category_name}</span>}
                   </div>
-                  <div 
-                    className="result-summary"
-                    dangerouslySetInnerHTML={{ __html: article.summary }}
-                  />
+                  <div className="result-summary" dangerouslySetInnerHTML={{ __html: a.summary }} />
                 </article>
               ))}
             </div>
-            
-            {/* 分页 - 当结果超过10篇时显示 (requirement 7.2) */}
+
             {pagination && pagination.total > 10 && (
               <div className="pagination">
-                <button
-                  disabled={!pagination.hasPrev}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  className="pagination-button"
-                >
-                  上一页
-                </button>
-                <span className="pagination-info">
-                  第 {pagination.page} 页，共 {pagination.totalPages} 页 (共 {pagination.total} 篇文章)
-                </span>
-                <button
-                  disabled={!pagination.hasNext}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  className="pagination-button"
-                >
-                  下一页
-                </button>
+                <button disabled={!pagination.hasPrev} onClick={() => handlePageChange(page - 1)} className="pagination-button">上一页</button>
+                <span className="pagination-info">第 {pagination.page} 页，共 {pagination.totalPages} 页</span>
+                <button disabled={!pagination.hasNext} onClick={() => handlePageChange(page + 1)} className="pagination-button">下一页</button>
               </div>
             )}
           </>
         ) : (
-          <EmptyState message="未找到相关文章，请尝试其他关键词" />
+          <EmptyState message="没找到相关文章" />
         )}
       </div>
     </div>

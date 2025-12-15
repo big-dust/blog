@@ -6,18 +6,14 @@ import LoginModal from './LoginModal';
 import './Header.css';
 
 function Header() {
-  const { isAuthenticated, user, logout } = useAuth();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-
-  const handleLoginClick = () => {
-    setShowLoginModal(true);
-  };
+  const { isAuthenticated, logout } = useAuth();
+  const [showLogin, setShowLogin] = useState(false);
 
   const handleLogout = async () => {
     try {
       await logout();
-    } catch (error) {
-      console.error('Logout failed:', error);
+    } catch (e) {
+      console.log('登出失败');
     }
   };
 
@@ -38,29 +34,19 @@ function Header() {
             {isAuthenticated ? (
               <>
                 <Link to="/admin" className="nav-link">管理</Link>
-                <button 
-                  onClick={handleLogout} 
-                  className="nav-link logout-button"
-                >
+                <button onClick={handleLogout} className="nav-link logout-button">
                   登出
                 </button>
               </>
             ) : (
-              <button 
-                onClick={handleLoginClick} 
-                className="nav-link login-button"
-              >
+              <button onClick={() => setShowLogin(true)} className="nav-link login-button">
                 登录
               </button>
             )}
           </nav>
         </div>
       </div>
-      
-      <LoginModal 
-        isOpen={showLoginModal} 
-        onClose={() => setShowLoginModal(false)} 
-      />
+      <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
     </header>
   );
 }

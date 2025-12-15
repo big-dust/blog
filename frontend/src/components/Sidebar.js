@@ -1,4 +1,3 @@
-import React from 'react';
 import TagCloud from './TagCloud';
 import CategoryList from './CategoryList';
 import './Sidebar.css';

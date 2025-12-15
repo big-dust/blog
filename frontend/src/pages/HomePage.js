@@ -1,4 +1,3 @@
-import React from 'react';
 import ArticleList from '../components/ArticleList';
 import Sidebar from '../components/Sidebar';
 import './HomePage.css';

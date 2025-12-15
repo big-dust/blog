@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ArticleList from '../components/ArticleList';
 import EmptyState from '../components/EmptyState';
@@ -12,57 +12,30 @@ function TagPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTag = async () => {
+    const fetch = async () => {
       try {
         setLoading(true);
-        setError(null);
-        const response = await tagService.getTag(id);
-        setTag(response.data);
-      } catch (err) {
-        console.error('Failed to fetch tag:', err);
-        setError('标签加载失败');
-        setTag(null);
+        const res = await tagService.getTag(id);
+        setTag(res.data);
+      } catch (e) {
+        setError('加载失败');
       } finally {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchTag();
-    }
+    if (id) fetch();
   }, [id]);
 
   if (loading) return <div className="loading">加载中...</div>;
-  
-  if (error) {
-    return (
-      <div className="tag-page">
-        <div className="tag-container">
-          <EmptyState message={error} icon="❌" />
-        </div>
-      </div>
-    );
-  }
-  
-  if (!tag) {
-    return (
-      <div className="tag-page">
-        <div className="tag-container">
-          <EmptyState message="标签未找到" icon="🔍" />
-        </div>
-      </div>
-    );
-  }
+  if (error) return <div className="tag-page"><div className="tag-container"><EmptyState message={error} icon="❌" /></div></div>;
+  if (!tag) return <div className="tag-page"><div className="tag-container"><EmptyState message="标签不存在" icon="🔍" /></div></div>;
 
   return (
     <div className="tag-page">
       <div className="tag-container">
         <div className="tag-header">
           <h1>
-            标签: 
-            <span className="tag-badge" style={{ backgroundColor: tag.color || '#007bff' }}>
-              {tag.name}
-            </span>
+            标签: <span className="tag-badge" style={{ backgroundColor: tag.color || '#007bff' }}>{tag.name}</span>
           </h1>
         </div>
         <ArticleList tagId={id} />

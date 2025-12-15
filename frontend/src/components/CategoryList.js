@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import categoryService from '../services/categoryService';
 import EmptyState from './EmptyState';
@@ -10,41 +10,31 @@ function CategoryList() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetch = async () => {
       try {
         setLoading(true);
-        setError(null);
-        const response = await categoryService.getCategories();
-        setCategories(response.data || []);
-      } catch (err) {
-        console.error('Failed to fetch categories:', err);
-        setError('分类加载失败');
-        setCategories([]);
+        const res = await categoryService.getCategories();
+        setCategories(res.data || []);
+      } catch (e) {
+        setError('加载失败');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCategories();
+    fetch();
   }, []);
 
   if (loading) return <div className="loading">加载中...</div>;
-  
-  if (error) {
-    return <EmptyState message={error} icon="❌" />;
-  }
-
-  if (categories.length === 0) {
-    return <EmptyState message="暂无分类" icon="📁" />;
-  }
+  if (error) return <EmptyState message={error} icon="❌" />;
+  if (categories.length === 0) return <EmptyState message="暂无分类" icon="📁" />;
 
   return (
     <ul className="category-list">
-      {categories.map(category => (
-        <li key={category.id} className="category-item">
-          <Link to={`/category/${category.id}`} className="category-link">
-            <span className="category-name">{category.name}</span>
-            <span className="category-count">({category.count || 0})</span>
+      {categories.map(c => (
+        <li key={c.id} className="category-item">
+          <Link to={`/category/${c.id}`} className="category-link">
+            <span className="category-name">{c.name}</span>
+            <span className="category-count">({c.count || 0})</span>
           </Link>
         </li>
       ))}

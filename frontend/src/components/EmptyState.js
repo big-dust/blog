@@ -1,4 +1,3 @@
-import React from 'react';
 import './EmptyState.css';
 
 function EmptyState({ message = '暂无内容', icon = '📝' }) {

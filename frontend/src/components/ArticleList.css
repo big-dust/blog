@@ -5,31 +5,28 @@
 .articles {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 20px;
 }
 
 .article-card {
   background: white;
-  border: 1px solid #e1e5e9;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 1.5rem;
-  transition: box-shadow 0.2s;
+  padding: 20px;
 }
 
 .article-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .article-title {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin: 0 0 15px 0;
+  font-size: 22px;
 }
 
 .article-title a {
   text-decoration: none;
   color: #333;
-  transition: color 0.2s;
 }
 
 .article-title a:hover {
@@ -38,14 +35,14 @@
 
 .article-meta {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  color: #666;
+  gap: 15px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: gray;
 }
 
 .article-summary {
-  margin: 0 0 1rem 0;
+  margin: 0 0 15px 0;
   color: #555;
   line-height: 1.6;
 }
@@ -55,37 +52,34 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 10px;
 }
 
 .category-link {
-  background-color: #f8f9fa;
-  color: #495057;
-  padding: 0.25rem 0.75rem;
+  background: #f5f5f5;
+  color: #333;
+  padding: 5px 12px;
   border-radius: 4px;
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
+  font-size: 14px;
 }
 
 .category-link:hover {
-  background-color: #e9ecef;
+  background: #eee;
 }
 
 .article-tags {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .tag-link {
   color: white;
-  padding: 0.25rem 0.5rem;
+  padding: 4px 10px;
   border-radius: 12px;
   text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: opacity 0.2s;
+  font-size: 12px;
 }
 
 .tag-link:hover {
@@ -96,119 +90,53 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding: 1rem;
+  gap: 15px;
+  margin-top: 30px;
+  padding: 15px;
 }
 
 .pagination-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  padding: 10px 20px;
+  background: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
 }
 
 .pagination-button:hover:not(:disabled) {
-  background-color: #0056b3;
+  background: #0056b3;
 }
 
 .pagination-button:disabled {
-  background-color: #6c757d;
+  background: gray;
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .pagination-info {
   color: #666;
-  font-size: 0.9rem;
-}
-
-.loading {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-size: 1.1rem;
+  font-size: 14px;
 }
 
 .error-state {
   text-align: center;
-  padding: 2rem;
-  color: #dc3545;
+  padding: 30px;
+  color: red;
 }
 
 .retry-button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
 }
 
-.retry-button:hover {
-  background-color: #0056b3;
-}
-
-/* Responsive design for mobile devices (requirement 1.5) */
 @media (max-width: 768px) {
-  .article-list {
-    padding: 0 1rem;
-  }
-
-  .article-card {
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .article-title {
-    font-size: 1.25rem;
-  }
-
-  .article-meta {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .article-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .pagination {
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem 0.5rem;
-  }
-
-  .pagination-info {
-    order: -1;
-    text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .article-card {
-    padding: 0.75rem;
-  }
-
-  .article-title {
-    font-size: 1.1rem;
-  }
-
-  .article-meta {
-    font-size: 0.8rem;
-  }
-
-  .pagination-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-  }
+  .article-card { padding: 15px; }
+  .article-title { font-size: 18px; }
+  .article-meta { flex-direction: column; gap: 5px; }
+  .pagination { flex-direction: column; }
 }

@@ -7,11 +7,7 @@ import './ArticleEditor.css';
 function ArticleEditor({ editingArticle, onSave, onCancel }) {
   const { isAuthenticated } = useAuth();
   const [article, setArticle] = useState({
-    title: '',
-    content: '',
-    summary: '',
-    categoryId: '',
-    tags: []
+    title: '', content: '', summary: '', categoryId: '', tags: []
   });
   const [categories, setCategories] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
@@ -21,115 +17,76 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
   const [filteredTags, setFilteredTags] = useState([]);
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
 
-  // Load categories and tags on component mount
+  // 加载分类和标签
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [categoriesRes, tagsRes] = await Promise.all([
+        const [catRes, tagRes] = await Promise.all([
           categoryService.getCategories(),
           tagService.getTags()
         ]);
-        setCategories(categoriesRes.data || []);
-        setAvailableTags(tagsRes.data || []);
-      } catch (error) {
-        console.error('Failed to load categories and tags:', error);
+        setCategories(catRes.data || []);
+        setAvailableTags(tagRes.data || []);
+      } catch (e) {
+        console.log('加载分类标签失败');
       }
     };
-
     loadData();
   }, []);
 
-  // Set article data when editing - 只在 editingArticle 变化时执行
+  // 编辑模式下填充数据
   useEffect(() => {
     if (editingArticle) {
-      // 处理标签数据 - 后端返回的可能是字符串数组，需要转换为对象数组
-      let articleTags = [];
+      let tags = [];
       if (editingArticle.tag_ids && editingArticle.tags) {
-        const tagIds = editingArticle.tag_ids;
-        const tagNames = editingArticle.tags;
-        
-        articleTags = tagIds.map((id, index) => {
-          const tagId = parseInt(id);
-          const tagName = tagNames[index];
-          
-          return {
-            id: tagId,
-            name: tagName,
-            color: '#007bff' // 默认颜色，后续会从 availableTags 更新
-          };
-        });
+        tags = editingArticle.tag_ids.map((id, i) => ({
+          id: parseInt(id),
+          name: editingArticle.tags[i],
+          color: '#007bff'
+        }));
       }
-
       setArticle({
         title: editingArticle.title || '',
         content: editingArticle.content || '',
         summary: editingArticle.summary || '',
         categoryId: editingArticle.category_id || '',
-        tags: articleTags
+        tags
       });
     } else {
-      // 重置表单为新建文章状态
-      setArticle({
-        title: '',
-        content: '',
-        summary: '',
-        categoryId: '',
-        tags: []
-      });
+      setArticle({ title: '', content: '', summary: '', categoryId: '', tags: [] });
     }
-    // 注意：只依赖 editingArticle，避免更新标签列表时重置文章状态
   }, [editingArticle]);
 
-
-
-  // Form submission hook
   const { loading: saving, error: saveError, submit } = useFormSubmit(
-    async (formData) => {
+    async (data) => {
       if (editingArticle) {
-        return articleService.updateArticle(editingArticle.id, formData);
-      } else {
-        return articleService.createArticle(formData);
+        return articleService.updateArticle(editingArticle.id, data);
       }
+      return articleService.createArticle(data);
     },
     {
       onSuccess: (result) => {
-        alert(editingArticle ? '文章更新成功！' : '文章创建成功！');
-        if (onSave) {
-          onSave(result);
-        }
+        alert(editingArticle ? '更新成功！' : '创建成功！');
+        if (onSave) onSave(result);
         if (!editingArticle) {
-          // Reset form for new articles
-          setArticle({
-            title: '',
-            content: '',
-            summary: '',
-            categoryId: '',
-            tags: []
-          });
+          setArticle({ title: '', content: '', summary: '', categoryId: '', tags: [] });
         }
       },
-      onError: (error) => {
-        alert(`保存失败: ${error.message}`);
-      }
+      onError: (e) => alert(`保存失败: ${e.message}`)
     }
   );
 
-  const handleInputChange = (field, value) => {
+  const handleChange = (field, value) => {
     setArticle(prev => ({ ...prev, [field]: value }));
   };
 
-
-
   const handleTagInputChange = (value) => {
     setTagInput(value);
-    console.log('Tag input changed:', value);
-    console.log('Available tags:', availableTags);
     if (value.trim()) {
-      const filtered = availableTags.filter(tag => 
-        tag.name.toLowerCase().includes(value.toLowerCase()) &&
-        !article.tags.find(t => t.id === tag.id)
+      const filtered = availableTags.filter(t =>
+        t.name.toLowerCase().includes(value.toLowerCase()) &&
+        !article.tags.find(at => at.id === t.id)
       );
-      console.log('Filtered tags:', filtered);
       setFilteredTags(filtered);
       setShowTagSuggestions(true);
     } else {
@@ -139,154 +96,88 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
   };
 
   const handleTagSelect = (tag) => {
-    setArticle(prev => ({
-      ...prev,
-      tags: [...prev.tags, tag]
-    }));
+    setArticle(prev => ({ ...prev, tags: [...prev.tags, tag] }));
     setTagInput('');
     setShowTagSuggestions(false);
   };
 
-  const handleTagRemove = (tagToRemove) => {
-    setArticle(prev => ({
-      ...prev,
-      tags: prev.tags.filter(t => t.id !== tagToRemove.id)
-    }));
+  const handleTagRemove = (tag) => {
+    setArticle(prev => ({ ...prev, tags: prev.tags.filter(t => t.id !== tag.id) }));
   };
 
+  // 创建新标签
   const handleCreateNewTag = async () => {
-    const tagName = tagInput.trim();
-    if (!tagName) return;
-
-    // 防止重复创建
-    if (availableTags.find(tag => tag.name.toLowerCase() === tagName.toLowerCase())) {
+    const name = tagInput.trim();
+    if (!name) return;
+    if (availableTags.find(t => t.name.toLowerCase() === name.toLowerCase())) {
       alert('标签已存在');
       return;
     }
-
     try {
-      const response = await tagService.createTag({
-        name: tagName,
-        color: '#007bff'
-      });
-      
-      if (response.success && response.data) {
-        const newTag = response.data;
-        
-        // 立即清理输入状态
+      const res = await tagService.createTag({ name, color: '#007bff' });
+      if (res.success && res.data) {
+        const newTag = res.data;
         setTagInput('');
         setShowTagSuggestions(false);
-        setFilteredTags([]);
-        
-        // 更新可用标签列表
-        setAvailableTags(prevTags => [...prevTags, newTag]);
-        
-        // 添加到文章标签
-        setArticle(prevArticle => ({
-          ...prevArticle,
-          tags: [...prevArticle.tags, newTag]
-        }));
-        
-        // 延迟显示成功消息，避免阻塞 UI 更新
-        setTimeout(() => {
-          alert('新标签创建成功！');
-        }, 100);
-      } else {
-        throw new Error('标签创建响应格式错误');
+        setAvailableTags(prev => [...prev, newTag]);
+        setArticle(prev => ({ ...prev, tags: [...prev.tags, newTag] }));
       }
-    } catch (error) {
-      console.error('创建标签失败:', error);
-      alert(`创建标签失败: ${error.message}`);
+    } catch (e) {
+      alert('创建标签失败');
     }
   };
 
   const handleTagInputKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (filteredTags.length > 0) {
-        handleTagSelect(filteredTags[0]);
-      } else if (tagInput.trim()) {
-        handleCreateNewTag();
-      }
+      if (filteredTags.length > 0) handleTagSelect(filteredTags[0]);
+      else if (tagInput.trim()) handleCreateNewTag();
     } else if (e.key === 'Escape') {
       setShowTagSuggestions(false);
       setTagInput('');
     }
   };
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
+  // 上传图片
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
     if (!file) return;
-
     setIsUploading(true);
     setUploadProgress(0);
-
     try {
       const result = await uploadService.uploadImage(file, {
-        onProgress: (progress) => {
-          setUploadProgress(progress);
-        }
+        onProgress: (p) => setUploadProgress(p)
       });
-
-      // Insert image markdown into content at cursor position
-      const imageMarkdown = `![${file.name}](${result.data.url})`;
-      const textarea = event.target.closest('.form-group').querySelector('textarea');
-      const cursorPos = textarea.selectionStart;
-      const textBefore = article.content.substring(0, cursorPos);
-      const textAfter = article.content.substring(cursorPos);
-      
-      setArticle(prev => ({
-        ...prev,
-        content: textBefore + imageMarkdown + textAfter
-      }));
-
-      alert('图片上传成功！');
-    } catch (error) {
-      alert(`图片上传失败: ${error.message}`);
+      const md = `![${file.name}](${result.data.url})`;
+      const textarea = e.target.closest('.form-group').querySelector('textarea');
+      const pos = textarea.selectionStart;
+      const before = article.content.substring(0, pos);
+      const after = article.content.substring(pos);
+      setArticle(prev => ({ ...prev, content: before + md + after }));
+      alert('上传成功！');
+    } catch (err) {
+      alert('上传失败');
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
-      event.target.value = ''; // Reset file input
+      e.target.value = '';
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!isAuthenticated) {
-      alert('请先登录');
-      return;
-    }
-
+    if (!isAuthenticated) { alert('请先登录'); return; }
     if (!article.title.trim() || !article.content.trim()) {
       alert('请填写标题和内容');
       return;
     }
-
-    const formData = {
+    await submit({
       title: article.title.trim(),
       content: article.content.trim(),
       summary: article.summary.trim(),
       category_id: article.categoryId || null,
-      tag_ids: article.tags.map(tag => tag.id)
-    };
-
-    await submit(formData);
-  };
-
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    } else {
-      // Reset form
-      setArticle({
-        title: '',
-        content: '',
-        summary: '',
-        categoryId: '',
-        tags: []
-      });
-    }
+      tag_ids: article.tags.map(t => t.id)
+    });
   };
 
   return (
@@ -298,8 +189,8 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
             id="title"
             type="text"
             value={article.title}
-            onChange={(e) => handleInputChange('title', e.target.value)}
-            placeholder="输入文章标题..."
+            onChange={(e) => handleChange('title', e.target.value)}
+            placeholder="输入标题..."
             required
           />
         </div>
@@ -309,8 +200,8 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
           <textarea
             id="summary"
             value={article.summary}
-            onChange={(e) => handleInputChange('summary', e.target.value)}
-            placeholder="输入文章摘要..."
+            onChange={(e) => handleChange('summary', e.target.value)}
+            placeholder="输入摘要..."
             rows="3"
           />
         </div>
@@ -321,13 +212,11 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
             <select
               id="category"
               value={article.categoryId}
-              onChange={(e) => handleInputChange('categoryId', e.target.value)}
+              onChange={(e) => handleChange('categoryId', e.target.value)}
             >
               <option value="">选择分类</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
+              {categories.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
           </div>
@@ -336,16 +225,10 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
             <label>标签</label>
             <div className="tag-input-container">
               <div className="selected-tags">
-                {article.tags.map(tag => (
-                  <span key={tag.id} className="selected-tag" style={{ backgroundColor: tag.color }}>
-                    {tag.name}
-                    <button
-                      type="button"
-                      className="remove-tag"
-                      onClick={() => handleTagRemove(tag)}
-                    >
-                      ×
-                    </button>
+                {article.tags.map(t => (
+                  <span key={t.id} className="selected-tag" style={{ backgroundColor: t.color }}>
+                    {t.name}
+                    <button type="button" className="remove-tag" onClick={() => handleTagRemove(t)}>×</button>
                   </span>
                 ))}
               </div>
@@ -362,27 +245,14 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
                 />
                 {showTagSuggestions && (tagInput.trim() || filteredTags.length > 0) && (
                   <div className="tag-suggestions">
-                    {/* 显示匹配的标签 */}
-                    {filteredTags.map(tag => (
-                      <div
-                        key={tag.id}
-                        className="tag-suggestion"
-                        onClick={() => handleTagSelect(tag)}
-                      >
-                        <span className="tag-preview" style={{ backgroundColor: tag.color }}>
-                          {tag.name}
-                        </span>
+                    {filteredTags.map(t => (
+                      <div key={t.id} className="tag-suggestion" onClick={() => handleTagSelect(t)}>
+                        <span className="tag-preview" style={{ backgroundColor: t.color }}>{t.name}</span>
                       </div>
                     ))}
-                    {/* 只有当输入不完全匹配任何已有标签时，才显示创建新标签选项 */}
-                    {tagInput.trim() && !filteredTags.find(tag => tag.name.toLowerCase() === tagInput.trim().toLowerCase()) && (
-                      <div
-                        className="tag-suggestion create-new"
-                        onClick={handleCreateNewTag}
-                      >
-                        <span className="create-tag-text">
-                          + 创建新标签: "{tagInput.trim()}"
-                        </span>
+                    {tagInput.trim() && !filteredTags.find(t => t.name.toLowerCase() === tagInput.trim().toLowerCase()) && (
+                      <div className="tag-suggestion create-new" onClick={handleCreateNewTag}>
+                        <span className="create-tag-text">+ 创建: "{tagInput.trim()}"</span>
                       </div>
                     )}
                   </div>
@@ -397,41 +267,29 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
           <div className="content-editor">
             <div className="editor-toolbar">
               <label className="upload-button">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={isUploading}
-                  style={{ display: 'none' }}
-                />
+                <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} style={{ display: 'none' }} />
                 {isUploading ? `上传中... ${uploadProgress}%` : '上传图片'}
               </label>
             </div>
             <textarea
               id="content"
               value={article.content}
-              onChange={(e) => handleInputChange('content', e.target.value)}
-              placeholder="输入文章内容（支持 Markdown）..."
+              onChange={(e) => handleChange('content', e.target.value)}
+              placeholder="输入内容（支持Markdown）..."
               rows="15"
               required
             />
           </div>
         </div>
 
-        {saveError && (
-          <div className="error-message">
-            保存失败: {saveError}
-          </div>
-        )}
+        {saveError && <div className="error-message">保存失败: {saveError}</div>}
 
         <div className="form-actions">
           <button type="submit" className="save-button" disabled={saving || isUploading}>
-            {saving ? '保存中...' : (editingArticle ? '更新文章' : '保存文章')}
+            {saving ? '保存中...' : (editingArticle ? '更新' : '保存')}
           </button>
           {onCancel && (
-            <button type="button" className="cancel-button" onClick={handleCancel}>
-              取消
-            </button>
+            <button type="button" className="cancel-button" onClick={onCancel}>取消</button>
           )}
         </div>
       </form>
