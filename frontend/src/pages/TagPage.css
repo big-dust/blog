@@ -1,0 +1,31 @@
+.tag-page {
+  padding: 2rem 0;
+}
+
+.tag-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.tag-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.tag-header h1 {
+  margin: 0;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tag-badge {
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}

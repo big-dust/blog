@@ -1,0 +1,214 @@
+.article-list {
+  width: 100%;
+}
+
+.articles {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.article-card {
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.article-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.article-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.article-title a {
+  text-decoration: none;
+  color: #333;
+  transition: color 0.2s;
+}
+
+.article-title a:hover {
+  color: #007bff;
+}
+
+.article-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.article-summary {
+  margin: 0 0 1rem 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.category-link {
+  background-color: #f8f9fa;
+  color: #495057;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.category-link:hover {
+  background-color: #e9ecef;
+}
+
+.article-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag-link {
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.tag-link:hover {
+  opacity: 0.8;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.pagination-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.pagination-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: 2rem;
+  color: #dc3545;
+}
+
+.retry-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive design for mobile devices (requirement 1.5) */
+@media (max-width: 768px) {
+  .article-list {
+    padding: 0 1rem;
+  }
+
+  .article-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .article-title {
+    font-size: 1.25rem;
+  }
+
+  .article-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .article-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .pagination-info {
+    order: -1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .article-card {
+    padding: 0.75rem;
+  }
+
+  .article-title {
+    font-size: 1.1rem;
+  }
+
+  .article-meta {
+    font-size: 0.8rem;
+  }
+
+  .pagination-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}

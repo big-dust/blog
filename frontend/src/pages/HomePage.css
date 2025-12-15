@@ -1,0 +1,31 @@
+.home-page {
+  padding: 2rem 0;
+}
+
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+}
+
+.home-main {
+  min-width: 0;
+}
+
+.home-sidebar {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .home-sidebar {
+    order: -1;
+  }
+}

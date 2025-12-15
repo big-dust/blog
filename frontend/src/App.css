@@ -1,0 +1,29 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #dc3545;
+}
+
+.not-found {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}

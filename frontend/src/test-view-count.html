@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试浏览次数</title>
+</head>
+<body>
+    <h1>测试浏览次数增加</h1>
+    <p>当前文章 12601 的浏览次数: <span id="viewCount">加载中...</span></p>
+    <button onclick="incrementView()">手动增加浏览次数</button>
+    <button onclick="getViewCount()">获取当前浏览次数</button>
+
+    <script>
+        async function getViewCount() {
+            try {
+                const response = await fetch('http://localhost:3001/api/articles/12601');
+                const data = await response.json();
+                document.getElementById('viewCount').textContent = data.data.view_count;
+                console.log('当前浏览次数:', data.data.view_count);
+            } catch (error) {
+                console.error('获取浏览次数失败:', error);
+            }
+        }
+
+        async function incrementView() {
+            try {
+                const response = await fetch('http://localhost:3001/api/articles/12601/view', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                console.log('浏览次数增加结果:', data);
+                getViewCount(); // 刷新显示
+            } catch (error) {
+                console.error('增加浏览次数失败:', error);
+            }
+        }
+
+        // 页面加载时获取当前浏览次数
+        getViewCount();
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试评论功能</title>
+</head>
+<body>
+    <h1>测试评论 API</h1>
+    <button onclick="testGetComments()">获取评论</button>
+    <button onclick="testCreateComment()">创建评论</button>
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        
+        async function testGetComments() {
+            try {
+                const response = await fetch(`${API_BASE}/articles/12600/comments`);
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testCreateComment() {
+            try {
+                const response = await fetch(`${API_BASE}/articles/12600/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nickname: '测试用户' + Date.now(),
+                        email: 'test@example.com',
+                        content: '这是测试评论 ' + new Date().toLocaleString()
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

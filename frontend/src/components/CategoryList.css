@@ -1,0 +1,33 @@
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-item {
+  margin-bottom: 0.5rem;
+}
+
+.category-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: #333;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.category-link:hover {
+  background-color: #f8f9fa;
+}
+
+.category-name {
+  font-weight: 500;
+}
+
+.category-count {
+  color: #666;
+  font-size: 0.9rem;
+}
