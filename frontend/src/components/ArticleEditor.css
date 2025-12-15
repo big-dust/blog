@@ -96,23 +96,36 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* 新的标签输入样式 */
+/* 新的标签输入样式 - 与分类框保持一致 */
 .tag-input-container {
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  padding: 0.875rem 1rem;
+  padding: 0 1rem;
   background-color: #ffffff;
-  min-height: 48px;
+  height: 48px;
   transition: all 0.2s ease;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* 当有选中标签时，允许容器扩展 */
+.tag-input-container:has(.selected-tag) {
+  height: auto;
+  min-height: 48px;
+  padding: 0.5rem 1rem;
 }
 
 .tag-input-container:focus-within {
   border-color: #4299e1;
   box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+}
+
+/* 当下拉框显示时，移除底部圆角 */
+.tag-input-container:has(.tag-suggestions) {
+  border-radius: 6px 6px 0 0;
+  border-bottom-color: transparent;
 }
 
 .tag-input-container:hover {
@@ -124,10 +137,11 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .selected-tags:not(:empty) {
-  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .selected-tag {
@@ -169,40 +183,55 @@
 }
 
 .tag-input-wrapper {
-  position: relative;
+  position: static;
+  flex: 1;
+  min-width: 100px;
 }
 
-.tag-input {
+.tag-input-wrapper .tag-input {
   width: 100%;
   border: none !important;
   outline: none;
-  padding: 0;
+  padding: 0 !important;
   margin: 0;
   font-size: 1rem;
-  background: transparent;
+  background: transparent !important;
+  background-color: transparent !important;
   line-height: 1.5;
-  min-height: 20px;
+  height: 24px !important;
   box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
-.tag-input:focus {
+.tag-input-wrapper .tag-input:focus {
   border: none !important;
   box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.tag-input-wrapper .tag-input:hover {
+  border: none !important;
+  background: transparent !important;
+}
+
+.tag-input::placeholder {
+  color: #9ca3af;
 }
 
 .tag-suggestions {
   position: absolute;
   top: 100%;
-  left: 0;
-  right: 0;
+  left: -1px;
+  right: -1px;
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid #d1d5db;
   border-top: none;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 6px 6px;
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .tag-suggestion {

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { flushSync } from 'react-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useFormSubmit } from '../hooks/useAPI';
 import { articleService, categoryService, tagService, uploadService } from '../services';
@@ -40,7 +39,7 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
     loadData();
   }, []);
 
-  // Set article data when editing
+  // Set article data when editing - 只在 editingArticle 变化时执行
   useEffect(() => {
     if (editingArticle) {
       // 处理标签数据 - 后端返回的可能是字符串数组，需要转换为对象数组
@@ -53,13 +52,10 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
           const tagId = parseInt(id);
           const tagName = tagNames[index];
           
-          // 从可用标签列表中找到对应的标签，获取颜色信息
-          const fullTag = availableTags.find(tag => tag.id === tagId);
-          
           return {
             id: tagId,
             name: tagName,
-            color: fullTag ? fullTag.color : '#007bff' // 默认颜色
+            color: '#007bff' // 默认颜色，后续会从 availableTags 更新
           };
         });
       }
@@ -81,12 +77,10 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
         tags: []
       });
     }
-  }, [editingArticle, availableTags]);
+    // 注意：只依赖 editingArticle，避免更新标签列表时重置文章状态
+  }, [editingArticle]);
 
-  // 调试：监控 article.tags 的变化
-  useEffect(() => {
-    console.log('Article tags changed:', article.tags);
-  }, [article.tags]);
+
 
   // Form submission hook
   const { loading: saving, error: saveError, submit } = useFormSubmit(
@@ -128,11 +122,14 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
 
   const handleTagInputChange = (value) => {
     setTagInput(value);
+    console.log('Tag input changed:', value);
+    console.log('Available tags:', availableTags);
     if (value.trim()) {
       const filtered = availableTags.filter(tag => 
         tag.name.toLowerCase().includes(value.toLowerCase()) &&
         !article.tags.find(t => t.id === tag.id)
       );
+      console.log('Filtered tags:', filtered);
       setFilteredTags(filtered);
       setShowTagSuggestions(true);
     } else {
@@ -176,29 +173,19 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
       if (response.success && response.data) {
         const newTag = response.data;
         
-        // 使用 flushSync 确保状态更新是同步的
-        flushSync(() => {
-          // 立即清理输入状态
-          setTagInput('');
-          setShowTagSuggestions(false);
-          setFilteredTags([]);
-          
-          // 更新可用标签列表
-          setAvailableTags(prevTags => {
-            console.log('Adding new tag to available tags:', newTag);
-            return [...prevTags, newTag];
-          });
-          
-          // 添加到文章标签
-          setArticle(prevArticle => {
-            const updatedTags = [...prevArticle.tags, newTag];
-            console.log('Adding new tag to article tags:', updatedTags);
-            return {
-              ...prevArticle,
-              tags: updatedTags
-            };
-          });
-        });
+        // 立即清理输入状态
+        setTagInput('');
+        setShowTagSuggestions(false);
+        setFilteredTags([]);
+        
+        // 更新可用标签列表
+        setAvailableTags(prevTags => [...prevTags, newTag]);
+        
+        // 添加到文章标签
+        setArticle(prevArticle => ({
+          ...prevArticle,
+          tags: [...prevArticle.tags, newTag]
+        }));
         
         // 延迟显示成功消息，避免阻塞 UI 更新
         setTimeout(() => {
@@ -373,8 +360,9 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
                   placeholder="搜索或创建标签..."
                   className="tag-input"
                 />
-                {showTagSuggestions && (
+                {showTagSuggestions && (tagInput.trim() || filteredTags.length > 0) && (
                   <div className="tag-suggestions">
+                    {/* 显示匹配的标签 */}
                     {filteredTags.map(tag => (
                       <div
                         key={tag.id}
@@ -386,13 +374,14 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
                         </span>
                       </div>
                     ))}
-                    {tagInput.trim() && !filteredTags.find(tag => tag.name.toLowerCase() === tagInput.toLowerCase()) && (
+                    {/* 只有当输入不完全匹配任何已有标签时，才显示创建新标签选项 */}
+                    {tagInput.trim() && !filteredTags.find(tag => tag.name.toLowerCase() === tagInput.trim().toLowerCase()) && (
                       <div
                         className="tag-suggestion create-new"
                         onClick={handleCreateNewTag}
                       >
                         <span className="create-tag-text">
-                          创建新标签: "{tagInput}"
+                          + 创建新标签: "{tagInput.trim()}"
                         </span>
                       </div>
                     )}
