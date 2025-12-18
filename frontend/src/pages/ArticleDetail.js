@@ -10,7 +10,7 @@ function ArticleDetail() {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const viewCounted = useRef(false);
+  const viewCounted = useRef(false);  // 防止浏览量重复计数
 
   useEffect(() => {
     const fetch = async () => {

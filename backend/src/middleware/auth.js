@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 
+// 
+const JWT_SECRET = 'my_blog_secret_key_123';
+
 // 检查token
 const checkToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -9,7 +12,7 @@ const checkToken = (req, res, next) => {
     return res.status(401).json({ error: '没有token' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       // token过期或者无效
       return res.status(403).json({ error: 'token无效' });
@@ -21,13 +24,13 @@ const checkToken = (req, res, next) => {
 
 // 生成token
 const makeToken = (data, expiresIn = '24h') => {
-  return jwt.sign(data, process.env.JWT_SECRET, { expiresIn });
+  return jwt.sign(data, JWT_SECRET, { expiresIn });
 };
 
 // 验证token
 const verifyToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, JWT_SECRET);
   } catch (e) {
     return null;
   }

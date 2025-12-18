@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
     const offset = (pageNum - 1) * limitNum;
     const likeKeyword = `%${keyword}%`;
 
-    // like
+    // LIKE 模糊搜索
     const sql = `
       SELECT a.id, a.title, a.content, a.summary, a.view_count, a.created_at,
         c.name as category_name
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
       LEFT JOIN categories c ON a.category_id = c.id
       WHERE LOWER(a.title) LIKE ? OR LOWER(a.content) LIKE ?
       ORDER BY a.created_at DESC
-      LIMIT ? OFFSET ?
+      LIMIT ${limitNum} OFFSET ${offset}
     `;
 
     const countSql = `
@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
     `;
 
     // 执行查询
-    const articles = await db.query(sql, [likeKeyword, likeKeyword, limitNum, offset]);
+    const articles = await db.query(sql, [likeKeyword, likeKeyword]);
     const countResult = await db.query(countSql, [likeKeyword, likeKeyword]);
 
     const total = countResult[0].total;

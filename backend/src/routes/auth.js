@@ -1,5 +1,4 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const { pool } = require('../config/database');
 const { generateToken, verifyToken, authenticateToken } = require('../middleware/auth');
 
@@ -25,9 +24,8 @@ router.post('/login', async (req, res) => {
 
     const user = users[0];
 
-    // 验证密码
-    const isValid = await bcrypt.compare(password, user.password_hash);
-    if (!isValid) {
+    // 验证密码（明文比较）
+    if (password !== user.password_hash) {
       return res.status(401).json({ error: '用户名或密码错误' });
     }
 

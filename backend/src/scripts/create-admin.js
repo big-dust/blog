@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const { pool } = require('../config/database');
 
 /**
@@ -12,12 +11,11 @@ async function createAdmin() {
     const adminData = {
       username: 'admin',
       email: 'admin@blog.com',
-      password: 'admin123' // 默认密码，生产环境应该修改
+      password: 'admin123' // 默认密码
     };
     
-    // 生成密码哈希
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(adminData.password, saltRounds);
+    // 明文存储密码
+    const passwordHash = adminData.password;
     
     // 插入或更新管理员用户
     await connection.execute(`
