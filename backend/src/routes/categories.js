@@ -139,7 +139,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const { name, description } = req.body;
 
     if (isNaN(id)) {
-      return res.status(400).json({ error: 'ID格式不对' });
+      return res.status(400).json({ error: 'Id格式不对' });
     }
     if (!name || name.trim().length === 0) {
       return res.status(400).json({ error: '名称不能为空' });

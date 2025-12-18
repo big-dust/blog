@@ -95,8 +95,6 @@ router.post('/refresh', async (req, res) => {
 router.get('/verify', authenticateToken, (req, res) => {
   res.json({ message: 'token有效', data: { user: req.user } });
 });
-
-// 获取当前用户
 router.get('/me', authenticateToken, async (req, res) => {
   try {
     const [users] = await pool.execute(

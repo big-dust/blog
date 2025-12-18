@@ -30,7 +30,7 @@ function CommentSection({ articleId }) {
     }
   };
 
-  // 简单验证
+  // 这里用正则校验一下
   const validate = (data) => {
     const { nickname, email, content } = data;
     if (!nickname || !email || !content) return '请填写完整';

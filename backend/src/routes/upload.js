@@ -6,13 +6,10 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// 上传目录
 const uploadDir = path.join(__dirname, '../../uploads/images');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
-
-// multer配置
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -24,8 +21,6 @@ const storage = multer.diskStorage({
     cb(null, `${ts}_${rand}${ext}`);
   }
 });
-
-// 只允许图片
 const fileFilter = (req, file, cb) => {
   const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
   if (allowed.includes(file.mimetype)) {
@@ -80,6 +75,7 @@ router.post('/image', authenticateToken, (req, res) => {
 // 获取图片列表
 router.get('/images', authenticateToken, (req, res) => {
   try {
+    // const files = fs.Sync(uploadDir);
     const files = fs.readdirSync(uploadDir);
     const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3001}`;
 

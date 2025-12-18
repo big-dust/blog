@@ -35,7 +35,7 @@ function TagPage() {
       <div className="tag-container">
         <div className="tag-header">
           <h1>
-            标签: <span className="tag-badge" style={{ backgroundColor: tag.color || '#007bff' }}>{tag.name}</span>
+            标签: <span className="tag-badge" style={{ backgroundColor: '#007bff' }}>{tag.name}</span>
           </h1>
         </div>
         <ArticleList tagId={id} />

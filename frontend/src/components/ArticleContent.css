@@ -60,6 +60,30 @@
   word-wrap: break-word;
 }
 
+/* 行内代码样式 */
+.inline-code {
+  background: #f1f3f4 !important;
+  padding: 0.2rem 0.4rem !important;
+  border-radius: 3px !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.9em !important;
+}
+
+/* 代码块样式 */
+.code-block {
+  background: #f8f9fa !important;
+  padding: 1rem !important;
+  border-radius: 4px !important;
+  overflow-x: auto !important;
+  margin: 1rem 0 !important;
+}
+
+.code-block code {
+  background: none !important;
+  padding: 0 !important;
+  font-family: 'Courier New', monospace !important;
+}
+
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3,

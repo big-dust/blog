@@ -59,7 +59,6 @@ class DatabaseUtils {
     }
   }
 
-  // 插入数据
   static async insert(tableName, data) {
     try {
       const fields = Object.keys(data);
@@ -93,7 +92,6 @@ class DatabaseUtils {
     }
   }
 
-  // 删除数据
   static async delete(tableName, where) {
     try {
       const whereFields = Object.keys(where).map(f => `${f} = ?`).join(' AND ');

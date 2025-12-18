@@ -48,7 +48,7 @@ function TagCloud() {
           key={t.id}
           to={`/tag/${t.id}`}
           className={`tag-cloud-item weight-${t.weight}`}
-          style={{ backgroundColor: t.color || '#007bff' }}
+          style={{ backgroundColor: '#007bff' }}
           title={`${t.name} (${t.count || 0} 篇)`}
         >
           {t.name} ({t.count || 0})

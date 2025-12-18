@@ -10,17 +10,22 @@ function ArticleManager({ onEditArticle }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     loadArticles();
-  }, []);
+  }, [page]);
 
   const loadArticles = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await articleService.getArticles({ limit: 100 });
+      const res = await articleService.getArticles({ page, limit: 10 });
       setArticles(res.data || []);
+      setTotalPages(res.pagination?.totalPages || 1);
+      setTotal(res.pagination?.total || 0);
     } catch (e) {
       setError('加载失败');
     } finally {
@@ -120,6 +125,14 @@ function ArticleManager({ onEditArticle }) {
           </tbody>
         </table>
       </div>
+
+      {total > 10 && (
+        <div className="pagination">
+          <button disabled={page === 1} onClick={() => setPage(page - 1)} className="pagination-button">上一页</button>
+          <span className="pagination-info">第 {page} 页，共 {totalPages} 页 (共 {total} 篇)</span>
+          <button disabled={page === totalPages} onClick={() => setPage(page + 1)} className="pagination-button">下一页</button>
+        </div>
+      )}
     </div>
   );
 }

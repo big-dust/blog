@@ -75,14 +75,14 @@ function SearchResults() {
               {results.map(a => (
                 <article key={a.id} className="search-result-item">
                   <h2 className="result-title">
-                    <Link to={`/article/${a.id}`} dangerouslySetInnerHTML={{ __html: a.title }} />
+                    <Link to={`/article/${a.id}`}>{a.title.replace(/<[^>]*>/g, '')}</Link>
                   </h2>
                   <div className="result-meta">
                     <span className="result-date">{new Date(a.created_at).toLocaleDateString('zh-CN')}</span>
                     <span className="result-views">浏览: {a.view_count || 0}</span>
                     {a.category_name && <span className="result-category">{a.category_name}</span>}
                   </div>
-                  <div className="result-summary" dangerouslySetInnerHTML={{ __html: a.summary }} />
+                  <p className="result-summary">{a.summary.replace(/<[^>]*>/g, '')}</p>
                 </article>
               ))}
             </div>

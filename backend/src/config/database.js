@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 
-// 数据库配置
+//  本地mysql账密
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 3306,

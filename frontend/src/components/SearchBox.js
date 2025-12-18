@@ -18,6 +18,12 @@ function SearchBox() {
     navigate(`/search?q=${encodeURIComponent(q)}`);
   };
 
+
+
+
+
+
+  // s
   return (
     <div className="search-box-container">
       <form className="search-box" onSubmit={handleSubmit}>

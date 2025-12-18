@@ -15,7 +15,7 @@ router.post('/:id/reply', async (req, res) => {
       return res.status(400).json({ error: '内容不能为空' });
     }
 
-    // 简单验证邮箱
+    // 一个正常表达式
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       return res.status(400).json({ error: '邮箱格式不对' });

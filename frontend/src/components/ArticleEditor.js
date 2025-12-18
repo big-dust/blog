@@ -153,8 +153,9 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
       const pos = textarea.selectionStart;
       const before = article.content.substring(0, pos);
       const after = article.content.substring(pos);
+      // 上传函数不仅上传，还修改内容
       setArticle(prev => ({ ...prev, content: before + md + after }));
-      alert('上传成功！');
+      alert('上传成功了');
     } catch (err) {
       alert('上传失败');
     } finally {
@@ -226,12 +227,18 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
             <div className="tag-input-container">
               <div className="selected-tags">
                 {article.tags.map(t => (
-                  <span key={t.id} className="selected-tag" style={{ backgroundColor: t.color }}>
+                  <span key={t.id} className="selected-tag" style={{ backgroundColor: '#007bff' }}>
                     {t.name}
                     <button type="button" className="remove-tag" onClick={() => handleTagRemove(t)}>×</button>
                   </span>
                 ))}
               </div>
+
+
+
+
+
+
               <div className="tag-input-wrapper">
                 <input
                   type="text"
@@ -240,14 +247,14 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
                   onKeyDown={handleTagInputKeyDown}
                   onFocus={() => tagInput && setShowTagSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowTagSuggestions(false), 300)}
-                  placeholder="搜索或创建标签..."
+                  placeholder="搜索已有或创建标签"
                   className="tag-input"
                 />
-                {showTagSuggestions && (tagInput.trim() || filteredTags.length > 0) && (
+                {showTagSuggestions && (filteredTags.length > 0) && (
                   <div className="tag-suggestions">
                     {filteredTags.map(t => (
                       <div key={t.id} className="tag-suggestion" onClick={() => handleTagSelect(t)}>
-                        <span className="tag-preview" style={{ backgroundColor: t.color }}>{t.name}</span>
+                        <span className="tag-preview" style={{ backgroundColor: '#007bff' }}>{t.name}</span>
                       </div>
                     ))}
                     {tagInput.trim() && !filteredTags.find(t => t.name.toLowerCase() === tagInput.trim().toLowerCase()) && (
@@ -268,7 +275,7 @@ function ArticleEditor({ editingArticle, onSave, onCancel }) {
             <div className="editor-toolbar">
               <label className="upload-button">
                 <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} style={{ display: 'none' }} />
-                {isUploading ? `上传中... ${uploadProgress}%` : '上传图片'}
+                {isUploading ? `上传中....... ${uploadProgress}%` : '上传图片'}
               </label>
             </div>
             <textarea
